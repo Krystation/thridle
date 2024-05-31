@@ -1,14 +1,14 @@
-import { json, LoaderFunction } from "@remix-run/node";
-import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from "@google/generative-ai";
-import dotenv from "dotenv";
+import { NextApiRequest, NextApiResponse } from 'next';
+import dotenv from 'dotenv';
+import { GoogleGenerativeAI, HarmCategory, HarmBlockThreshold } from '@google/generative-ai';
 
 dotenv.config();
 
-const MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = 'gemini-1.5-flash';
 const API_KEY = process.env.API_KEY as string;
 
 if (!API_KEY) {
-	throw new Error("API_KEY is not defined in environment variables.");
+	throw new Error('API_KEY is not defined in environment variables.');
 }
 
 interface GenerationConfig {
@@ -27,11 +27,11 @@ interface Part {
 	text: string;
 }
 
-export const loader: LoaderFunction = async () => {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
 	const genAI = new GoogleGenerativeAI(API_KEY);
 	const model = await genAI.getGenerativeModel({ model: MODEL_NAME });
 
-	console.log('Loader function reached');  // Debugging log
+	console.log('API route reached'); // Debugging log
 
 	const generationConfig: GenerationConfig = {
 		temperature: 1,
@@ -60,7 +60,7 @@ export const loader: LoaderFunction = async () => {
 	];
 
 	const parts: Part[] = [
-		{ text: 'Generate three five-letter words where each letter from one word does not appear in the other two words. The words should be separated by commas and there should be no other output. Whenever \"new\" is input, provide a new set of such words.' },
+		{ text: 'Generate three five-letter words where each letter from one word does not appear in the other two words. The words should be separated by commas and there should be no other output. Whenever "new" is input, provide a new set of such words.' },
 		{ text: "input: new" },
 		{ text: "output: brain,ghost,mucky" },
 		{ text: "input: new" },
@@ -72,11 +72,11 @@ export const loader: LoaderFunction = async () => {
 	];
 
 	const result = await model.generateContent({
-		contents: [{ role: "user", parts }],
+		contents: [{ role: 'user', parts }],
 		generationConfig,
 		safetySettings,
 	});
 
 	const response = result.response;
-	return json({ result: response.text() });
-};
+	res.status(200).json({ result: response.text() });
+}

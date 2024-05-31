@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from "react";
-import { validateWord } from "~/utils/validateWord"; // Adjust the import path as necessary
+import React, { useState, useEffect, useRef } from 'react';
+import { validateWord } from '../app/utils/validateWord';
 
 interface WordDisplayProps {
 	word: string;
@@ -9,30 +9,35 @@ interface WordDisplayProps {
 	setFirst: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetComplete, first, setFirst }) => {
+const WordDisplay: React.FC<WordDisplayProps> = ({
+	word,
+	resetInputs,
+	onResetComplete,
+	first,
+	setFirst,
+}) => {
 	const [letters, setLetters] = useState<string[]>(Array.from(word));
 	const [visibleIndex, setVisibleIndex] = useState<number | null>(null);
-	const [inputValues, setInputValues] = useState<string[]>(Array(5).fill(""));
-	const [backgroundColors, setBackgroundColors] = useState<string[]>(Array(5).fill(""));
+	const [inputValues, setInputValues] = useState<string[]>(Array(5).fill(''));
+	const [backgroundColors, setBackgroundColors] = useState<string[]>(Array(5).fill(''));
 	const [isValidWord, setIsValidWord] = useState<boolean | null>(null);
 	const [isCompleted, setIsCompleted] = useState<boolean>(false);
 	const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
 
 	useEffect(() => {
-		// Update letters and reset states when the word changes
 		setLetters(Array.from(word));
 		const randomIndex = Math.floor(Math.random() * word.length);
 		setVisibleIndex(randomIndex);
-		setInputValues(Array(5).fill(""));
-		setBackgroundColors(Array(5).fill(""));
+		setInputValues(Array(5).fill(''));
+		setBackgroundColors(Array(5).fill(''));
 		setIsValidWord(null);
 		setIsCompleted(false);
 	}, [word]);
 
 	useEffect(() => {
 		if (resetInputs) {
-			setInputValues(Array(5).fill(""));
-			setBackgroundColors(Array(5).fill(""));
+			setInputValues(Array(5).fill(''));
+			setBackgroundColors(Array(5).fill(''));
 			setIsValidWord(null);
 			setIsCompleted(false);
 			onResetComplete();
@@ -40,7 +45,6 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 	}, [resetInputs, onResetComplete]);
 
 	useEffect(() => {
-		// Focus the first available input that is not the visible letter
 		if (visibleIndex !== null) {
 			let firstInputIndex = 0;
 			while (firstInputIndex < inputRefs.current.length && firstInputIndex === visibleIndex) {
@@ -56,7 +60,6 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 			newInputValues[index] = value;
 			setInputValues(newInputValues);
 
-			// Move focus to the next input, skipping the visible letter if necessary
 			if (value && index < inputRefs.current.length - 1) {
 				let nextIndex = index + 1;
 				if (nextIndex === visibleIndex) {
@@ -80,7 +83,6 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 	};
 
 	const handleSubmit = async () => {
-		// Construct the full word including the visible letter
 		const userWordArray = [...inputValues];
 		if (visibleIndex !== null) {
 			userWordArray[visibleIndex] = letters[visibleIndex];
@@ -91,7 +93,7 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 
 		if (!isValid) {
 			setIsValidWord(false);
-			alert("The entered word is not a valid English word.");
+			alert('The entered word is not a valid English word.');
 			return;
 		}
 
@@ -101,24 +103,24 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 		inputValues.forEach((value, index) => {
 			if (index !== visibleIndex) {
 				if (value === letters[index]) {
-					newBackgroundColors[index] = "green";
+					newBackgroundColors[index] = 'green';
 				} else {
 					allCorrect = false;
 					if (letters.includes(value)) {
-						newBackgroundColors[index] = "yellow";
+						newBackgroundColors[index] = 'yellow';
 					} else {
-						newBackgroundColors[index] = "red";
+						newBackgroundColors[index] = 'red';
 					}
 				}
 			} else {
-				newBackgroundColors[index] = "green"; // Ensure visible letter has a green background
+				newBackgroundColors[index] = 'green';
 			}
 		});
 		setBackgroundColors(newBackgroundColors);
 
 		if (allCorrect) {
 			setIsCompleted(true);
-			setFirst(true); // This will set "first", "second", or "third" to true based on the passed props
+			setFirst(true);
 		}
 	};
 
@@ -135,10 +137,10 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 						onChange={(e) => handleChange(index, e.target.value)}
 						onKeyDown={(e) => handleKeyDown(index, e)}
 						style={{
-							width: "2em",
-							textAlign: "center",
-							backgroundColor: index === visibleIndex ? "green" : backgroundColors[index],
-							color: index === visibleIndex ? "white" : "black"
+							width: '2em',
+							textAlign: 'center',
+							backgroundColor: index === visibleIndex ? 'green' : backgroundColors[index],
+							color: index === visibleIndex ? 'white' : 'black',
 						}}
 						readOnly={index === visibleIndex || isCompleted}
 					/>
@@ -147,7 +149,7 @@ const WordDisplay: React.FC<WordDisplayProps> = ({ word, resetInputs, onResetCom
 			<button type="button" onClick={handleSubmit}>
 				Submit
 			</button>
-			{isValidWord === false && <p style={{ color: "red" }}>Invalid English word. Try again!</p>}
+			{isValidWord === false && <p style={{ color: 'red' }}>Invalid English word. Try again!</p>}
 		</div>
 	);
 };
